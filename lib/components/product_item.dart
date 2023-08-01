@@ -1,44 +1,51 @@
-// ignore_for_file: sort_child_properties_last, prefer_const_constructors
+// ignore_for_file: sort_child_properties_last, prefer_const_constructors, avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../model/Cart.dart';
 import '../model/Product.dart';
 import '../utils/routes.dart';
 
 class ProductItem extends StatelessWidget {
-  final Product product;
-
-  const ProductItem({
-    Key? key,
-    required this.product,
-  }) : super(key: key);
-
-  Widget productIcons(Icon icon, Color color) {
-    return IconButton(
-      onPressed: () {},
-      icon: icon,
-      color: color,
-    );
-  }
+  const ProductItem({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final product = Provider.of<Product>(
+      context,
+      listen: false,
+    );
+    final cart = Provider.of<Cart>(
+      context,
+      listen: false,
+    );
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
         footer: GridTileBar(
           backgroundColor: Colors.black87,
-          leading: productIcons(
-            Icon(Icons.favorite),
-            Theme.of(context).colorScheme.secondary,
+          leading: Consumer<Product>(
+            builder: (ctx, product, _) => IconButton(
+              onPressed: () {
+                product.toggleFavorite();
+              },
+              icon: Icon(
+                  product.isFavorite ? Icons.favorite : Icons.favorite_border),
+              color: Theme.of(context).colorScheme.secondary,
+            ),
           ),
           title: Text(
-            product.title,
+            product.name,
             textAlign: TextAlign.center,
           ),
-          trailing: productIcons(
-            Icon(Icons.shopping_cart),
-            Theme.of(context).colorScheme.secondary,
+          trailing: IconButton(
+            onPressed: () {
+              cart.addItem(product);
+            },
+            icon: Icon(Icons.shopping_cart),
+            color: Theme.of(context).colorScheme.secondary,
           ),
         ),
         child: GestureDetector(
