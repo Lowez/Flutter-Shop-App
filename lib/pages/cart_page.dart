@@ -45,7 +45,7 @@ class CartPage extends StatelessWidget {
                       'R\$${cart.totalAmount.toStringAsFixed(2)}',
                       style: TextStyle(
                         color:
-                            Theme.of(context).primaryTextTheme.headline6?.color,
+                            Theme.of(context).primaryTextTheme.titleLarge?.color,
                       ),
                     ),
                   ),

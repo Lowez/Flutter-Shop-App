@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_final_fields, file_names, unused_field
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:shop/data/dummy_data.dart';
 
 import 'Product.dart';
