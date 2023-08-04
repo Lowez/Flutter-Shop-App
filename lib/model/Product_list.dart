@@ -1,5 +1,8 @@
 // ignore_for_file: prefer_final_fields, file_names, unused_field
 
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shop/data/dummy_data.dart';
 
@@ -23,6 +26,33 @@ class ProductList with ChangeNotifier {
   void addProduct(Product product) {
     _items.add(product);
     notifyListeners();
+  }
+
+  void updateProduct(Product product) {
+    int index = _items.indexWhere((p) => p.id == product.id);
+
+    if (index >= 0) {
+      _items[index] = product;
+      notifyListeners();
+    }
+  }
+
+  void saveProduct(Map<String, Object> data) {
+    bool hasId = data['id'] != null;
+
+    final product = Product(
+      id: hasId ? data['id'] as String : Random().nextDouble().toString(),
+      name: data['name'] as String,
+      price: data['price'] as double,
+      description: data['description'] as String,
+      imageUrl: data['imageUrl'] as String,
+    );
+
+    if (hasId) {
+      updateProduct(product);
+    } else {
+      addProduct(product);
+    }
   }
 }
 
