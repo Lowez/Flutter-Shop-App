@@ -217,6 +217,13 @@ class _ProductFormPageState extends State<ProductFormPage> {
                   )
                 ],
               ),
+              Container(
+                margin: EdgeInsets.only(top: 10),
+                child: TextButton(
+                  onPressed: _submitForm,
+                  child: Text('Salvar', style: TextStyle(fontSize: 18),),
+                ),
+              ),
             ],
           ),
         ),
