@@ -39,22 +39,61 @@ class ProductItem extends StatelessWidget {
               icon: Icon(Icons.delete),
               color: Theme.of(context).colorScheme.error,
               onPressed: () {
-                Product backupProduct = product;
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('O produto ${backupProduct.name} foi removido!'),
-                    duration: Duration(seconds: 2),
-                    action: SnackBarAction(
-                      label: 'DESFAZER',
-                      onPressed: () {
-                      },
-                    ),
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Excluir Produto'),
+                    content: Text('Deseja remover o produto do sistema?'),
+                    actions: [
+                      TextButton(
+                        child: Text('Não'),
+                        onPressed: () {
+                          Navigator.of(context).pop(false);
+                        },
+                      ),
+                      TextButton(
+                        child: Text('Sim'),
+                        onPressed: () {
+                          Provider.of<ProductList>(
+                            context,
+                            listen: false,
+                          ).deleteProduct(
+                            product,
+                          );
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'O produto ${product.name} foi removido!',
+                              ),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          Navigator.of(context).pop(true);
+                        },
+                      )
+                    ],
                   ),
                 );
-                Provider.of<ProductList>(context, listen: false,).deleteProduct(
-                  product.id,
-                );
+                // Product backupProduct = product;
+                // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   SnackBar(
+                //     content:
+                //         Text('O produto ${backupProduct.name} foi removido!'),
+                //     duration: Duration(seconds: 2),
+                //     action: SnackBarAction(
+                //       label: 'DESFAZER',
+                //       onPressed: () {},
+                //     ),
+                //   ),
+                // );
+                // Provider.of<ProductList>(
+                //   context,
+                //   listen: false,
+                // ).deleteProduct(
+                //   product.id,
+                // );
               },
             )
           ],

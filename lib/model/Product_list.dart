@@ -1,14 +1,17 @@
-// ignore_for_file: prefer_final_fields, file_names, unused_field
+// ignore_for_file: prefer_final_fields, file_names, unused_field, unnecessary_brace_in_string_interps
 
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shop/data/dummy_data.dart';
 
 import 'Product.dart';
 
 class ProductList with ChangeNotifier {
+  final _baseUrl = 'https://shop-coder-4dab5-default-rtdb.firebaseio.com';
   List<Product> _items = dummyProducts;
 
   List<Product> get items {
@@ -23,21 +26,44 @@ class ProductList with ChangeNotifier {
     return _items.length;
   }
 
-  void addProduct(Product product) {
-    _items.add(product);
-    notifyListeners();
+  Future<void> addProduct(Product product) {
+    final future = http.post(
+      Uri.parse('${_baseUrl}/products.json'),
+      body: jsonEncode({
+        "name": product.name,
+        "description": product.description,
+        "price": product.price,
+        "imageUrl": product.imageUrl,
+        "isFavorite": product.isFavorite,
+      }),
+    );
+
+    return future.then<void>((response) {
+      final id = jsonDecode(response.body)['name'];
+      _items.add(Product(
+        id: id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        isFavorite: product.isFavorite,
+      ));
+      notifyListeners();
+    });
   }
 
-  void updateProduct(Product product) {
+  Future<void> updateProduct(Product product) {
     int index = _items.indexWhere((p) => p.id == product.id);
 
     if (index >= 0) {
       _items[index] = product;
       notifyListeners();
     }
+
+    return Future.value();
   }
 
-  void saveProduct(Map<String, Object> data) {
+  Future<void> saveProduct(Map<String, Object> data) {
     bool hasId = data['id'] != null;
 
     final product = Product(
@@ -49,35 +75,18 @@ class ProductList with ChangeNotifier {
     );
 
     if (hasId) {
-      updateProduct(product);
+      return updateProduct(product);
     } else {
-      addProduct(product);
+      return addProduct(product);
     }
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((p) => p.id == id);
+  void deleteProduct(Product product) {
+    int index = _items.indexWhere((p) => p.id == product.id);
 
-    notifyListeners();
+    if (index >= 0) {
+      _items.removeWhere((p) => p.id == product.id);
+      notifyListeners();
+    }
   }
 }
-
-// bool _showFavoritesOnly = false;
-
-//   List<Product> get items {
-//     if (_showFavoritesOnly) {
-//       return _items.where((product) => product.isFavorite).toList();
-//     }
-
-//     return [..._items];
-//   }
-
-//   void showFavoritesOnly() {
-//     _showFavoritesOnly = true;
-//     notifyListeners();
-//   }
-
-//   void showAll() {
-//     _showFavoritesOnly = false;
-//     notifyListeners();
-//   }
