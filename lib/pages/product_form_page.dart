@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, no_leading_underscores_for_local_identifiers, avoid_print, prefer_collection_literals, unused_local_variable, prefer_final_fields, unused_field
+// ignore_for_file: prefer_const_constructors, no_leading_underscores_for_local_identifiers, avoid_print, prefer_collection_literals, unused_local_variable, prefer_final_fields, unused_field, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +36,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     return isValid && endsWithFile;
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     final isValid = _formKey.currentState?.validate() ?? false;
 
     if (!isValid) {
@@ -49,11 +49,15 @@ class _ProductFormPageState extends State<ProductFormPage> {
       _isLoading = true;
     });
 
-    Provider.of<ProductList>(
-      context,
-      listen: false,
-    ).saveProduct(_formData).catchError((error) {
-      return showDialog<void>(
+    try {
+      await Provider.of<ProductList>(
+        context,
+        listen: false,
+      ).saveProduct(_formData);
+
+      Navigator.of(context).pop();
+    } catch (error) {
+      await showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Ocorreu um erro!'),
@@ -66,13 +70,11 @@ class _ProductFormPageState extends State<ProductFormPage> {
           ],
         ),
       );
-    }).then((value) {
+    } finally {
       setState(() {
         _isLoading = false;
       });
-
-      Navigator.of(context).pop();
-    });
+    }
   }
 
   @override
